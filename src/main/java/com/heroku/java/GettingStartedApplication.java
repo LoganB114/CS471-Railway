@@ -31,6 +31,7 @@ public class GettingStartedApplication {
     @SuppressWarnings("unused")
     @GetMapping("/database")
     String database(Map<String, Object> model) {
+        System.out.println("Print statement inside the GettingstartedApplication.database() method. Logan Byrum");
         try (Connection connection = dataSource.getConnection()) {
             final var statement = connection.createStatement();
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS table_timestamp_and_random_string (tick timestamp, random_string varchar(50))");
