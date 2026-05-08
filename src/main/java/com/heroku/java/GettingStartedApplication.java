@@ -5,9 +5,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
@@ -26,6 +29,41 @@ public class GettingStartedApplication {
     @GetMapping("/")
     public String index() {
         return "index";
+    }
+
+    @SuppressWarnings("unused")
+    @GetMapping("/dbinput")
+    public String dbinput() {
+        return "dbinput";
+    }
+
+    @SuppressWarnings("unused")
+    @PostMapping("/dbinput")
+    public String submitInput(@RequestParam("userInput") String userInput) {
+
+        try (Connection connection = dataSource.getConnection()) {
+
+            final var statement = connection.createStatement();
+
+            statement.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS table_timestamp_and_random_string (" +
+                            "tick timestamp, " +
+                            "random_string varchar(50))"
+            );
+
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO table_timestamp_and_random_string VALUES (now(), ?)"
+            );
+
+            ps.setString(1, userInput);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // redirect to database page after insert
+        return "redirect:/database";
     }
 
     @SuppressWarnings("unused")
